@@ -7,56 +7,59 @@ CREATE USER user2 WITH ENCRYPTED PASSWORD 'hola123';
 
 \c monitoreo
 
+CREATE TABLE cambio(
+		idCambio SERIAL PRIMARY KEY,
+		descripcion VARCHAR(30),
+		numeroCa INT NOT NULL
+);
+
 CREATE TABLE malware(
-		idMalware INT PRIMARY KEY,
+		idMalware SERIAL PRIMARY KEY,
 		tipoM VARCHAR(10) NOT NULL,
 		descripcion VARCHAR(30),
-		notificacion CHAR(1),
-		correo VARCHAR(30),
-
-		CONSTRAINT CKnotificacion
-		CHECK(notificacion IN ('S','s','N','n'))
+		idCambio INT REFERENCES cambio(idCambio) NOT NULL,
 );
 
-CREATE TABLE cambio(
-		idCambio INT PRIMARY KEY,
-		descripcion VARCHAR(30),
-		numeroCa INT NOT NULL,
-		idMalware INT REFERENCES malware(idMalware) NOT NULL
-);
 
-CREATE TABLE linea(
-		idLinea INT PRIMARY KEY,
+
+CREATE TABLE archivo(
+		idArchivo SERIAL PRIMARY KEY,
 		nombre VARCHAR(30) NOT NULL,
 		ubicacion VARCHAR(50) NOT NULL,
 		md5 VARCHAR(100) NOT NULL,
 		fechaCre TIMESTAMP NOT NULL
 );
 
-CREATE TABLE servicio(
-		idServicio INT PRIMARY KEY,
-		nombre VARCHAR(30) NOT NULL,
-		cms CHAR(1),
 
-		CONSTRAINT CKcms
-		CHECK(cms IN ('S','s','N','n'))
-);
 
 CREATE TABLE dominio(
-		idDominio INT PRIMARY KEY,
-		nombre VARCHAR(30) NOT NULL,
+		idDominio SERIAL PRIMARY KEY,
+		nombre VARCHAR(30),
 		ip VARCHAR(15) NOT NULL,
-		subdom VARCHAR(30) NOT NULL,
-		numSub INT NOT NULL,
-		segmento VARCHAR(20) NOT NULL,
-		idServicio INT REFERENCES servicio(idServicio) NOT NULL
+		segmento VARCHAR(20) 
 );
 
-CREATE TABLE liDomCam(
-		idLinea INT REFERENCES linea(idLinea) NOT NULL,
-		idDominio INT REFERENCES dominio(idDominio) NOT NULL,
-		idCambio INT REFERENCES cambio(idCambio) NOT NULL,
-		ultimaMod TIMESTAMP PRIMARY KEY
 
-		CONSTRAINT PKliDomCam PRIMARY KEY(idLinea, idDominio, idCambio, ultimaMod)
+CREATE TABLE servicio(
+		idServicio SERIAL PRIMARY KEY,
+		nombre VARCHAR(30) NOT NULL,
+		cms VARCHAR(20),
+		idDominio INT REFERENCES dominio(idDominio) NOT NULL,
+
+);
+
+
+CREATE TABLE top(
+		idTop SERIAL PRIMARY KEY,
+		idDominio INT REFERENCES dominio(idDominio) NOT NULL
+);
+
+
+CREATE TABLE ArDomCam(
+		idArchivo SERIAL REFERENCES archivo(idArchivo),
+		idDominio SERIAL REFERENCES dominio(idDominio),
+		idCambio SERIAL REFERENCES cambio(idCambio),
+		ultimaMod TIMESTAMP,
+
+		CONSTRAINT PKliDomCam PRIMARY KEY(idArchivo, idDominio, idCambio, ultimaMod)
 );
