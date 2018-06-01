@@ -45,6 +45,7 @@ CREATE TABLE servicio(
 		nombre VARCHAR(30) NOT NULL,
 		cms VARCHAR(20),
 		idDominio INT REFERENCES dominio(idDominio) NOT NULL,
+<<<<<<< Updated upstream
 
 );
 
@@ -62,4 +63,9 @@ CREATE TABLE ArDomCam(
 		ultimaMod TIMESTAMP,
 
 		CONSTRAINT PKliDomCam PRIMARY KEY(idArchivo, idDominio, idCambio, ultimaMod)
+=======
+		idCambio INT REFERENCES cambio(idCambio) NOT NULL,
+		ultimaMod TIMESTAMP,
+		CONSTRAINT PKliDomCam PRIMARY KEY(idLinea, idDominio, idCambio, ultimaMod)
+>>>>>>> Stashed changes
 );

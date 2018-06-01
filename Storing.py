@@ -43,63 +43,38 @@ def get_hosts(b1=None,b2=None,b3=None,b4=None):
     ars = locals()
     ip = ''
     for i in ars:
-        if ars[i]:
-            ip = ip + '%s.'%ars[i]
-            print i
-        else:
-            ip = ip + '%s.'%0
-            print i
-            print 0
-    if ars['b1']:
-        print ars['b1']
-        if ars['b2']:
-            print ars['b2']
-            if ars['b3']:
-                print ars['b3']
-                if ars['b4']:
-                    print ars['b4']
-                else:
-                    for l in range(256):
-                        ip = '%s.%s.%s.%s'%(ars['b1'],ars['b2'],ars['b3'],l)
-                        print ip
-                        try:
-                            sock = socket.create_connection((ip,80),timeout=1)
-                            sock.settimeout(None)
-                            sock.setblocking(1)
-                            print "yes"
-                            sock.close()
-                        except Exception as e:
-                            print e
+        if not ars[i]:
+            ars[i]=range(256)
+    for j in ars['b1']:
+        for i in ars['b2']:
+            for k in ars['b3']:
+                for l in ars['b4']:
+                    ip = '%s.%s.%s.%s'%(j,i,k,l)
+                    yield ip
 
-            else:
-                for k in range(256):
-                    for l in range(256):
-                        ip = '%s.%s.%s.%s'%(ars['b1'],ars['b2'],k,l)
-                        print ip
-        else:
-            for i in range(256):
-                for k in range(256):
-                    for l in range(256):
-                        ip = '%s.%s.%s.%s'%(ars['b1'],i,k,l)
-                        print ip
-    else:
-        ip = ''
-        for j in range(256):
-            for i in range(256):
-                for k in range(256):
-                    for l in range(256):
-                        ip = '%s.%s.%s.%s'%(j,i,k,l)
-                        print ip
-#    for i in range(256):
-#        print i
 
-get_hosts(b1='137',b2='247',b3=70)
-#sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-try:
-    sock =socket.create_connection(('132.247.7.15',443),timeout=1)
-    sock.settimeout(None)
-    print "yes"
-    sock.close()
-except Exception as e:
-    print e
+def Scan(ip):
+    try:
+        print '\n'
+        sock = socket.create_connection((ip,80),timeout=1)
+#        sock.settimeout(None)
+        sock.close()
+        print 'yes'
+        print ip
+    except Exception as e:
+        print e
+        print ip
 
+a = get_hosts(b1=['132'],b2=['248'],b3=['70'])#,b4=['15'])
+
+for i in a:
+    Scan(i)
+    
+#try:
+#    sock = socket.create_connection(('132.247.70.15',80),timeout=1)
+#    sock.settimeout(None)
+#    sock.close()
+#except Exception as e:
+#    print e
+#
+# https://websitesetup.org/popular-cms/

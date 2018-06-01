@@ -22,16 +22,15 @@ def genera_bd(fname,tabla,algo):
     Salida:
         None
     """
-    conn = psycopg2.connect("dbname=root user=root password=hola123.,")
+    conn = psycopg2.connect("dbname=monitoreo user=root password=hola123")
     cur = conn.cursor()
     cmd = "select (LOWER(tablename)) from pg_tables where schemaname like 'public' and tablename like LOWER('%s')" % (tabla)
     cur.execute(cmd)
     if cur.fetchone() is None:
         cur.execute("CREATE TABLE %s (id serial PRIMARY KEY, plain varchar%s);" % (tabla, ', "%s" varchar' * len(algo) % tuple(algo)))
 	conn.commit()
-                cmd = "INSERT INTO %s(plain, %s) VALUES ('%s', %s);" % (tabla, ('"%s",' * len(algo) % tuple(algo))[:-1], p, ("'%s'," * len(mh) % tuple(mh))[:-1])
-                cur.execute(cmd)
-                i = f.readline()
+        cmd = "INSERT INTO %s(plain, %s) VALUES ('%s', %s);" % (tabla, ('"%s",' * len(algo) % tuple(algo))[:-1], p, ("'%s'," * len(mh) % tuple(mh))[:-1])
+        cur.execute(cmd)
 	conn.commit()
 	cur.close()
 	conn.close()
@@ -48,42 +47,54 @@ def busca_hash(tabla,digest,algo):
     """
     plain = []
     disponibles = []
-    conn = psycopg2.connect("dbname=root user=root password=hola123.,")
+    conn = psycopg2.connect("dbname=monitoreo user=root password=hola123")
     cur = conn.cursor()
     cmd = "select (column_name) from information_schema.columns where LOWER(table_name) like LOWER('%s')" % (tabla)
-
     cur.execute(cmd)
     al = cur.fetchone()
     while al:
         disponibles.append(al[0])
         al = cur.fetchone()
-    for i in algo:
-        if i in disponibles:
-                cmd = "select (tablename) from pg_tables where schemaname like 'public' and tablename like '%s'" % (tabla)
-	        cur.execute(cmd)
-	        if cur.fetchone():
-	            cmd = "SELECT plain FROM %s WHERE %s like '%s'" % (tabla,i,digest)
-                    cur.execute(cmd)
-	            e = cur.fetchone()
-	            if e:
-	                plain.append((e[0],digest))
-    cur.close()
-    conn.close()
     return plain
 
-def ChartGen(n_groups=0,xlabel='',ylabel='',title='',data=[],ticks=[]):
+def db_con(fname='',tabla='',algo=''):
+    """
+    Genera la base de datos con todos los hashes de cada cadena de un archivo de entrada
+    Argumento:
+        Nombre del archivo donde se sacan las cadenas en claro (str)
+        Nombre de la tabla (str)
+    Salida:
+        None
+    """
+    conn = psycopg2.connect("dbname=monitoreo user=root password=hola123")
+    cur = conn.cursor()
+    cmd = "select (LOWER(tablename)) from pg_tables where schemaname like 'public'"
+    cur.execute(cmd)
+    al = cur.fetchone()
+    while al:
+        print al
+        al = cur.fetchone()
+    cur.close()
+    conn.close()
+
+def ChartGen(n_groups=0,xlabel='',ylabel='',title='',data=[],Lticks=()):
     opacity = 0.4
+    b_width = 0.25
+    ind = range(n_groups)
+    fig, ax = plt.subplots()
     error_config = {'ecolor': '0.3'}
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     ticks = [x + b_width / 2 for x in ind]
     ax.set_xticks(ticks)
-    ax.set_xticklabels(('A', 'B', 'C', 'D', 'E'))
+    ax.set_xticklabels(Lticks)
     ax.legend()
-    ax.bar(ticks,[2,3,2,2,5],label='Algo')
+    ax.bar(ticks,data,label='Algo')
     plt.savefig('Prueba.png')# Credit: Josh Hemann
 
+#ChartGen(5,'hola','hola','tit',[1,2,1,1,1],('a','b','c','d','e'))
+db_con()
 
 #n_groups = 5
 #xlabel = 'Grupos'
@@ -102,8 +113,8 @@ def ChartGen(n_groups=0,xlabel='',ylabel='',title='',data=[],ticks=[]):
 #ax.set_ylabel(ylabel)
 #ax.set_title(title)
 #ticks = [x + b_width / 2 for x in ind]
-ax.set_xticks(ticks)
-ax.set_xticklabels(('A', 'B', 'C', 'D', 'E'))
-ax.legend()
-ax.bar(ticks,[2,3,2,2,5],label='Algo')
-plt.savefig('Prueba.png')# Credit: Josh Hemann
+#ax.set_xticks(ticks)
+#ax.set_xticklabels(('A', 'B', 'C', 'D', 'E'))
+#ax.legend()
+#ax.bar(ticks,[2,3,2,2,5],label='Algo')
+#plt.savefig('Prueba.png')# Credit: Josh Hemann
