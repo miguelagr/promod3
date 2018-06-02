@@ -25,9 +25,9 @@ def inserta_bd_dominio(curl,url):
 	conn = psycopg2.connect("dbname=monitoreo user=root password=hola123")
 	cur = conn.cursor()
 	if "132.247." in url:
-		ip="247";
+		ip="247"
 	else:
-		ip"248";
+		ip="248"
 	if curl=="no":
 		cmd = "INSERT INTO dominio(nombre,ip,segmento) VALUES ('%s','%s','132.%s.0.0/24');" % ("null",url,ip)
 	else:
@@ -38,6 +38,7 @@ def inserta_bd_dominio(curl,url):
 	conn.close()
 
 def subdominios(url):
+	print(url)
 	fecha='date'
 	fecha=commands.getoutput(fecha)
 	curl='curl https://api.hackertarget.com/reverseiplookup/?q='+url+' -s'
@@ -66,6 +67,7 @@ def subdominios(url):
 #	servicios(url,texto)
 
 def archivos(url,puerto,texto,nombre):
+	print(url)
 	directorio='mkdir '+url
 	commands.getoutput(directorio)
 	f1 = open(url+'/'+nombre+'.txt','w')
@@ -103,11 +105,14 @@ def ping_funcion(j):
 			for k in range(1,256):
 				url="132."+str(i)+"."+str(val)+"."+str(k)
 #				ping='ping '+url+ ' -i .05 -w 100 -c 1 -l 10 | grep -i "ttl"'
-				ping='fping '+url+ ' -t1000'
+				ping='fping '+url+ ' -t100'
+		#		print(url)
 				ping=commands.getoutput(ping)
 #				if len(ping) !=0:
 				if ping.find("alive") >= 0:
+				#	print("asdasdasd")
 					subdominios(url)
+				#print(url)
 
 	
 
@@ -124,7 +129,7 @@ def inicial():
 #	k=k+1
 #a=urlparse.urlparse("132.148.10.143")
 #b=a.hostname.split(".")[0]
-#inicial()
+inicial()
 
 
 
